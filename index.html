@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    *{
+margin: 0;
+padding: 0;
+background-color: rgb(70, 70, 70);
+
+    }
+    .base{
+        width: 100vw;
+        height: 100vh;
+        display: grid;
+        place-items: center;
+       
+       
+    }
+    ul{
+        margin: 0;
+        padding: 0;
+    }
+    li{
+        text-decoration: none;
+        list-style: none;
+        margin: 5px 0;
+        padding: 0 10px;
+        
+    } 
+
+    .color{
+        color: white;
+        text-transform: capitalize;
+    }
+    #messages{
+        width: 100vw;
+        height: 80vh;
+        background-color: rgb(255, 255, 255);
+    }
+    h2{
+        color: white;
+        font-size: 30px;
+        text-transform: uppercase;
+        padding: 10px 0;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    #input{
+        width: 70vw;
+        height: 30px;
+        background-color: white;
+        border: none;
+    }
+    button{
+        width: 10vw;
+        background-color: rgb(0, 217, 255);
+        height: 30px;
+        border: none;
+        color: white;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+   
+</style>
+<body>
+    <div class="base">
+
+        <h2>nelson chat</h2>
+       
+        <ul id="messages"></ul>
+        <form id="form" action="">
+            <input id="input" autocomplete="off">
+            <button>Send</button>
+        </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script>
+        var socket =io()
+       var nome= prompt('Qual é o seu nome?')
+     
+       
+       socket.emit('new user',nome)
+
+       socket.on('new user', function(data){
+           if(data.success){
+               alert('bem vindo! ' + nome)
+           }else{
+               alert('ja existe um usuario com esse nome...')
+               window.location.href="/"
+           }
+       })
+
+       var form=document.getElementById('form')
+       var input = document.getElementById('input')
+       var messages = document.getElementById('messages')
+
+       form.addEventListener('submit',(e)=>{
+           e.preventDefault()
+           if(input.value){
+               socket.emit('chat message',{msg:input.value, nome:nome})
+               input.value=''
+            //    alert('mensagem foi inviada com sucesso!')
+           }
+       })
+
+       socket.on('chat message',(obj)=>{
+            if(obj.nome == nome){
+              var item= document.createElement('li')
+              item.style.backgroundColor='green'
+              item.style.marginLeft='200px'
+                item.style.borderBottomLeftRadius = '10px'
+                item.style.borderTopLeftRadius = '10px'
+                item.style.borderBottomRightRadius = '10px'
+           
+
+               /* item.innerHTML = obj.nome + ':' + '<br>' + obj.msg */
+               item.innerHTML=`<h5 class="color">${obj.nome}:</h5>${obj.msg}`
+              messages.appendChild(item)
+              window.screenTop(0, document.body.scrollHeight)
+
+            }else{
+              var item = document.createElement('li')
+                item.style.backgroundColor = 'gray'
+
+                
+                item.style.borderBottomLeftRadius = '10px'
+                item.style.borderTopRightRadius = '10px'
+                item.style.borderBottomRightRadius = '10px'
+
+               item.style.marginRight = '200px'
+                // item.innerHTML =obj.nome +':'+'<br>'+ obj.msg
+
+                 item.innerHTML = `<h5 class="color">${obj.nome}:</h5>${obj.msg}`
+                messages.appendChild(item)
+                 window.screenTop(0, document.body.scrollHeight)
+            }
+       })
+    </script>
+</body>
+</html>
